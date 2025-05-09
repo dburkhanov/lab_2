@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  django-app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8007:8007"
+    restart: unless-stopped
+    container_name: django-studenttracker
+    volumes:
+      - .:/app
+    environment:
+      - POSTGRES_DB=study
+      - POSTGRES_USER=userdb
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  db:
+    image: postgres:13
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    container_name: postgresql-db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=study
+      - POSTGRES_USER=userdb
+      - POSTGRES_PASSWORD=password
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
